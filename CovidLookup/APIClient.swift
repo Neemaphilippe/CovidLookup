@@ -20,7 +20,7 @@ struct APIClient {
     // URLSession is an asynchronous API
     // asynchronous code does not block UI, synchronous code blocks UI
     // escaping closure - function returns before
-    func fetchCovidData(completion: () -> ()) {
+    func fetchCovidData(completion: @escaping(Result<[Summary], Error>) -> ()) {
         //1. endpoint URL String
         let endpointURLString = "https://api.covid19api.com/summary"
         
@@ -34,15 +34,16 @@ struct APIClient {
         // need to get top level json - SummaryWrapper
         let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let error = error {
-//               return completion(.failure(error))
+               return completion(.failure(error))
             }
             if let jsonData = data {
                 //JSON Decoder is a function that throws, need a do/catch
                 // convert data to our swift model
                 do {
-                    let countries = try JSONDecoder().decode(SummaryWrapper.self, from: jsonData)
+                    let countries = try JSONDecoder().decode(SummaryWrapper.self, from: jsonData).countries
+                    return completion(.success(countries))
                 } catch {
-//                    completion(.failure(error))
+                    completion(.failure(error))
                 }
             }
         }

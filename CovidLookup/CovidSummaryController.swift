@@ -27,19 +27,20 @@ class CovidSummaryController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         fetchCovidData()
+        tableView.dataSource = self 
 
     }
     
 
     private func fetchCovidData() {
-        apiClient.fetchCovidData {
-//            (result) in
-//            switch result {
-//            case .failure(let error):
-//                print(error)
-//            case .success(let countries):
-//                self?.countriesSummary = countries
-//            }
+        apiClient.fetchCovidData { [weak self]
+            (result) in
+            switch result {
+            case .failure(let error):
+                print(error)
+            case .success(let countries):
+                self?.countriesSummary = countries
+            }
         }
     }
     
